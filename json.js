@@ -24,11 +24,11 @@ function unsnapify(data) {
 	if (data instanceof List) {
 	    var result = [];
 	    while (data.isLinked) {
-		result.push(native(data.first));
+		result.push(unsnapify(data.first));
 		data = data.rest;
 	    }
 	    for (var i = 0; i < data.contents.length; i++) {
-		result.push(native(data.contents[i]));
+		result.push(unsnapify(data.contents[i]));
 	    }
 	    return result;
 	} else if (data instanceof Hashtable) {
@@ -37,7 +37,7 @@ function unsnapify(data) {
 		if (typeof key !== 'string') {
 		    throw new Error('json key must be string ' + key);
 		}
-		result[key] = value;
+		result[key] = unsnapify(value);
 	    });
 	    return result;
 	} else {
