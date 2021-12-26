@@ -19,7 +19,7 @@ function snapify(js) {
 	return js;
     }
 }
-function js(data) {
+function unsnapify(data) {
     if (typeof data === 'object') {
 	if (data instanceof List) {
 	    var result = [];
@@ -52,7 +52,7 @@ function parse(json) {
     return snapify(JSON.parse(json));
 }
 function stringify(snap) {
-    return JSON.stringify(js(snap));
+    return JSON.stringify(unsnapify(snap));
 }
 
 SnapExtensions.primitives.set('jso_parse(json)', parse);
