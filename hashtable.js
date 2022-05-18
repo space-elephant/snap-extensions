@@ -2,77 +2,6 @@ window.Hashtable = function() {
     this.obj = {};
     this.changed();
 };
-Hashtable.prototype.stringify = function(object) {
-    var type = typeof(object);
-    if (type === 'boolean') {
-	return String(object)
-    } else if (object === null || type !== 'object') {
-        return  '"' + String(object).replace(/\\/, '\\\\').replace(/"/g, '\\\"') + '"';
-    }
-    else if (object instanceof Context) {
-        return this.stringifyContext(object.expression.components()).join('');
-    }
-    else if (object instanceof List) {
-        return this.stringifyList(object).join('');
-    }
-    else if (object instanceof Hashtable) {
-        return this.stringifyHashtable(object);
-    }
-    else {
-        throw new Error('unable to stringify ' + object)
-    } 
-};
-Hashtable.prototype.stringifyContext = function(components, start) {
-    start = start || ['c'];
-    var selector
-    for (var i = 0; i < components.length; i++) {
-	if (components[i] instanceof List) {
-	    start.push('(');
-	    this.stringifyContext(components[i], start);
-	    start.push(')');
-	} else if (components[i] instanceof Context) {
-	    start.push(expression.selector === 'reportGetVar' ?
-		       'v' + expression.blockSpec :
-		       'b' + expression.selector);
-	} else {
-	    start.push(this.stringify(components[i]));
-	}
-	start.push(',');
-    }
-    return start;
-};
-Hashtable.prototype.stringifyList = function(list, start) {
-    start = start || ['l'];
-    var expand = function(data, index, table) {
-	start.push('[');
-	start.push(table.stringify(data));
-	start.push(']');
-    };
-    var index = 0;
-    while (list.isLinked) {
-        list.isImmutable = true;
-        expand(list.first, index, this);
-        index ++;
-        list = list.rest;
-    }
-    for (var i = 0; i < list.contents.length; i++) {
-        expand(list.contents[i], index + i, this);
-    }
-    return start;
-};
-Hashtable.prototype.stringifyHashtable = function (table) {
-    if (table === this) {
-        throw new Error('hashtable cannot be its own key');
-    }
-    var data = ['h'];
-    for (let [hashkey, value] of Object.entries(table.obj)) {
-	data.push(this.stringify(hashkey));
-	data.push(':');
-	data.push(this.stringify(value));
-	data.push(',');
-    }
-    return data.join('');
-};
 Hashtable.prototype.asString = function() {
     data = ['{']
     var index;
@@ -88,20 +17,17 @@ Hashtable.prototype.asString = function() {
     return data.join('');
 };
 Hashtable.prototype.get = function(key) {
-    var hash = this.stringify(key);
-    var list = this.obj[hash];
-    if (list === undefined) {return undefined;}
-    return list[1];
+    var value = this.obj[key];
+    if (value === undefined) {return undefined;}
+    return value;
 };
 Hashtable.prototype.set = function(key, value) {
     this.changed();
-    var hash = this.stringify(key);
-    this.obj[hash] = [key, value];
+    this.obj[key] = value;
 };
 Hashtable.prototype.remove = function(key) {
     this.changed();
-    var hash = this.stringify(key);
-    delete this.obj[hash];
+    delete this.obj[key];
 };
 Hashtable.prototype.clear = function() {
     this.changed();
@@ -110,7 +36,7 @@ Hashtable.prototype.clear = function() {
 Hashtable.prototype.foreach = function(map) {
     var hash, list;
     for (let [hashkey, value] of Object.entries(this.obj)) {
-        map(value[0], value[1]);
+        map(hashkey, value);
     }
 };
 Hashtable.prototype.keys = function() {
