@@ -3,7 +3,7 @@ function load() {
     var result;
     var input = document.createElement('input');
     input.type = 'file';
-    document.body.onfocus = function () {
+    input.addEventListener("change", function () {
 	if (input.files.length === 0) {
 	    done = true;
 	    result = false;
@@ -15,7 +15,7 @@ function load() {
 	    };
 	    reader.readAsDataURL(input.files[0]);
 	}
-    };
+    }, false);
     input.click();
     return new List([function() {return done; }, function() {return result; }]);
 }
