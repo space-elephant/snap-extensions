@@ -22,7 +22,7 @@ function load() {
 
 SnapExtensions.primitives.set(
     'sav_upload()',
-    function() {return load(); }
+    load
 );
 SnapExtensions.primitives.set(
     'sav_download(data, filename)',
