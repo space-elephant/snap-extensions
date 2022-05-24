@@ -1,27 +1,27 @@
-function load() {
-    var done = false;
-    var result;
+function load(list) {
+    list.clear();
+    list.add(false);
+    list.add(0);
     var input = document.createElement('input');
     input.type = 'file';
     input.addEventListener("change", function () {
 	if (input.files.length === 0) {
-	    done = true;
-	    result = false;
+	    list.put(true, 1);
+	    list.put(false, 2);
 	} else {
 	    var reader = new FileReader();
 	    reader.onload = function(e) {
-		done = true;
-		result = atob(this.result.substring(this.result.indexOf(';base64,') + 8));
+		list.put(true, 1);
+		list.put(atob(this.result.substring(this.result.indexOf(';base64,') + 8)), 2);
 	    };
 	    reader.readAsDataURL(input.files[0]);
 	}
     }, false);
     input.click();
-    return new List([function() {return done; }, function() {return result; }]);
 }
 
 SnapExtensions.primitives.set(
-    'sav_upload()',
+    'sav_upload(list)',
     load
 );
 SnapExtensions.primitives.set(
