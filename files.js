@@ -1,5 +1,5 @@
-function load(list) {
-    list.clear();
+function load() {
+    var list = new List();
     list.add(false);
     list.add(0);
     var input = document.createElement('input');
@@ -18,10 +18,11 @@ function load(list) {
 	}
     }, false);
     input.click();
+    return list;
 }
 
 SnapExtensions.primitives.set(
-    'sav_upload(list)',
+    'sav_upload()',
     load
 );
 SnapExtensions.primitives.set(
